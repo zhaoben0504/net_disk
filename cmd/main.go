@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
+	"net_disk/server/router"
 )
 
 var configFile = flag.String("f", "etc/core-api.yaml", "the config file")
@@ -19,7 +20,7 @@ func main() {
 	defer server.Stop()
 
 	ctx := NewServiceContext(c)
-	handler.RegisterHandlers(server, ctx)
+	router.RegisterHandlers(server, ctx)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()

@@ -1,6 +1,9 @@
 package middleware
 
-import "net/http"
+import (
+	"net/http"
+	"net_disk/server"
+)
 
 type AuthMiddleware struct {
 }
@@ -18,7 +21,7 @@ func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			w.Write([]byte("UnAuthorize"))
 			return
 		}
-		uc, err := helper.AnalyzeToke(auth)
+		uc, err := server.AnalyzeToke(auth)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte(err.Error()))

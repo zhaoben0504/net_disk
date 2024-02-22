@@ -53,3 +53,5 @@ func initRedis(addr string) *redis.Client {
 		DB:       0,  // use default DB
 	})
 }
+
+//func initMinio()
