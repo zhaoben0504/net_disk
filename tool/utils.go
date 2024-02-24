@@ -1,4 +1,4 @@
-package server
+package tool
 
 import (
 	"bytes"
@@ -6,7 +6,6 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
 	uuid2 "github.com/hashicorp/go-uuid"
 	"io"
 	"math/rand"
@@ -16,6 +15,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"suhc-gitlab-01.inovance.local/mnk/server/lcdp.git/server"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func Md5(str string) string {
 }
 
 func GenerateToken(id int64, identity, name string, second int64) (string, error) {
-	uc := UserClaim{
+	uc := server.UserClaim{
 		Id:       id,
 		Identity: identity,
 		Name:     name,
@@ -35,17 +35,17 @@ func GenerateToken(id int64, identity, name string, second int64) (string, error
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, uc)
-	tokenString, err := token.SignedString([]byte(JwtKey))
+	tokenString, err := token.SignedString([]byte(server.JwtKey))
 	if err != nil {
 		return "", err
 	}
 	return tokenString, nil
 }
 
-func AnalyzeToke(token string) (*UserClaim, error) {
-	uc := &UserClaim{}
+func AnalyzeToke(token string) (*server.UserClaim, error) {
+	uc := &server.UserClaim{}
 	claims, err := jwt.ParseWithClaims(token, uc, func(token *jwt.Token) (interface{}, error) {
-		return []byte(JwtKey), nil
+		return []byte(server.JwtKey), nil
 	})
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func GenerateEmailCode() string {
 	str := "1234567890"
 	code := ""
 	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < EmailCodeLen; i++ {
+	for i := 0; i < server.EmailCodeLen; i++ {
 		code += string(str[rand.Intn(len(str))])
 	}
 	return code
@@ -80,12 +80,12 @@ func GenerateUUID() string {
 
 // upload file to COS
 func UploadCos(req *http.Request) (string, error) {
-	u, _ := url.Parse(COSADDR)
+	u, _ := url.Parse(server.COSADDR)
 	b := &cos.BaseURL{BucketURL: u}
 	client := cos.NewClient(b, &http.Client{
 		Transport: &cos.AuthorizationTransport{
-			SecretID:  os.Getenv(CloudId),
-			SecretKey: os.Getenv(CloudKey),
+			SecretID:  os.Getenv(server.CloudId),
+			SecretKey: os.Getenv(server.CloudKey),
 		},
 	})
 
